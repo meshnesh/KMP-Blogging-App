@@ -9,14 +9,29 @@ import kotlinx.serialization.encodeToString
 
 suspend fun checkUserExistence(user: User): UserWithoutPassword? {
     return try {
-        val result = window.api.tryPost(
+        window.api.tryPost(
             apiPath = "usercheck",
             body = Json.encodeToString(user).encodeToByteArray()
-        )
-        result?.decodeToString()?.let { Json.decodeFromString(it) }
+        )?.decodeToString().parseData()
     } catch (e: Exception) {
-//        println("CURRENT_USER")
+        println("CURRENT_USER")
         println(e.message)
         null
     }
+}
+
+suspend fun checkUserId(id: String): Boolean {
+    return try {
+        window.api.tryPost(
+            apiPath = "checkuserid",
+            body = Json.encodeToString(id).encodeToByteArray()
+        )?.decodeToString().parseData()
+    } catch (e: Exception) {
+        println(e.message.toString())
+        false
+    }
+}
+
+inline fun <reified T> String?.parseData(): T {
+    return Json.decodeFromString(this.toString())
 }
