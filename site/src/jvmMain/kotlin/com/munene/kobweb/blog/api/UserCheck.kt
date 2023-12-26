@@ -15,9 +15,7 @@ import java.security.MessageDigest
 @Api(routeOverride = "usercheck")
 suspend fun userCheck(context: ApiContext) {
     try {
-        val userRequest = context.req.body?.decodeToString()?.let {
-            Json.decodeFromString<User>(it)
-        }
+        val userRequest = context.req.body?.decodeToString()?.let { Json.decodeFromString<User>(it) }
 
         val user = userRequest?.let {
             context.data.getValue<MongoDB>().checkUserExistence(User(username = it.username, password = hashPassword(it.password)))
@@ -26,7 +24,7 @@ suspend fun userCheck(context: ApiContext) {
         if (user != null ) {
             context.res.setBodyText(
                 Json.encodeToString(
-                    UserWithoutPassword(id = user.id, username = user.username)
+                    UserWithoutPassword(_id = user._id, username = user.username)
                 )
             )
         } else {

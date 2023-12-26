@@ -1,33 +1,29 @@
 package com.munene.kobweb.blog.data
 
+
 import com.mongodb.client.model.Filters
+import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.munene.kobweb.blog.models.User
 import com.munene.kobweb.blog.util.Constants.DATABASE_NAME
 import com.varabyte.kobweb.api.data.add
 import com.varabyte.kobweb.api.init.InitApi
 import com.varabyte.kobweb.api.init.InitApiContext
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import org.litote.kmongo.reactivestreams.KMongo
-import org.litote.kmongo.reactivestreams.getCollectionOfName
+import kotlinx.coroutines.flow.firstOrNull
 
 @InitApi
-fun initMongoDb(
-    context: InitApiContext
-) {
+fun initMongoDb( cxt: InitApiContext ) {
     System.setProperty(
         "org.litote.mongo.test.mapping.service",
         "org.litote.kmongo.serialization.SerializationClassMappingTypeService"
     )
-    context.data.add(MongoDB(context))
+    cxt.data.add(MongoDB(cxt))
 }
 class MongoDB(private val context: InitApiContext): MongoRepository {
 
     // For testing with a localhost.
-    private val client = KMongo.createClient()
+    private val client = MongoClient.create()
     private val dataBase= client.getDatabase(DATABASE_NAME)
-    private val userCollection = dataBase.getCollectionOfName<User>("user")
-    // For a remote mongo database.
-//    private val client = MongoClient.create(System.getenv("MONGODB_URI"))
+    private val userCollection = dataBase.getCollection<User>("user")
     override suspend fun checkUserExistence(user: User): User? {
         return try {
             userCollection
@@ -36,7 +32,7 @@ class MongoDB(private val context: InitApiContext): MongoRepository {
                         Filters.eq(User::username.name, user.username),
                         Filters.eq(User::password.name, user.password)
                     )
-                ).awaitFirstOrNull()
+                ).firstOrNull()
         } catch (e: Exception) {
             context.logger.error(e.message.toString())
             null
