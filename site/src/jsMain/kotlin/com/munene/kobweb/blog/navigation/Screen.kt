@@ -3,13 +3,13 @@ package com.munene.kobweb.blog.navigation
 sealed class Screen(val route: String) {
     data object AdminHome : Screen(route = "/admin")
     data object AdminLogin : Screen(route = "/admin/login")
-//    object AdminCreate : Screen(route = "/admin/create") {
-//        fun passPostId(id: String) = "/admin/create?${POST_ID_PARAM}=$id"
-//    }
-//
-//    object AdminMyPosts : Screen(route = "/admin/myposts") {
-//        fun searchByTitle(query: String) = "/admin/myposts?${QUERY_PARAM}=$query"
-//    }
+    data object AdminCreate : Screen(route = "/admin/create") {
+        fun passPostId(id: String) = "/admin/create"
+    }
+
+    data object AdminMyPosts : Screen(route = "/admin/myposts") {
+        fun searchByTitle(query: String) = "/admin/myposts"
+    }
 //
 //    object AdminSuccess : Screen(route = "/admin/success") {
 //        fun postUpdated() = "/admin/success?${UPDATED_PARAM}=true"
